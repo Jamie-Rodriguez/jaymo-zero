@@ -14,7 +14,7 @@ Shell scripts
 =============
 The shell scripts provided are mostly to help myself remember how to do certain things in the Python ecosystem.
 
-Although the scripts are just references, I do recommend using `run-tests.sh` however. See [Run unit tests](run-unit-tests).
+Although the scripts are just references, I do recommend using `run-tests.sh` however. See [Run unit tests](4-run-unit-tests).
 
 Instructions
 ============
