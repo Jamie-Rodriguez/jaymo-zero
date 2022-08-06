@@ -21,12 +21,12 @@ def test_apply_move():
 
 def test_apply_move_to_state():
     assert {'board': [0b100010010, 0b011000101],
-            'current_player': 0} == apply_move_to_state({'board': [0b100010010, 0b011000100],
-                                                         'current_player': 1},
+            'player_to_move': 0} == apply_move_to_state({'board': [0b100010010, 0b011000100],
+                                                         'player_to_move': 1},
                                                         0b000000001)
     assert {'board': [0b100011010, 0b011000101],
-            'current_player': 1} == apply_move_to_state({'board': [0b100010010, 0b011000101],
-                                                         'current_player': 0},
+            'player_to_move': 1} == apply_move_to_state({'board': [0b100010010, 0b011000101],
+                                                         'player_to_move': 0},
                                                         0b000001000)
 
 def test_is_full():

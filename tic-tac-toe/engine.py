@@ -8,7 +8,7 @@ from printing import print_game_state, print_board
 
 class State(TypedDict):
     bitboards: List[int]
-    current_player: int
+    player_to_move: int
 
 '''
   Uses a modified version of Brian Kernighan’s Algorithm.
@@ -52,10 +52,10 @@ def apply_move(bitboards, player, move):
 
 def apply_move_to_state(state, move):
     # type: (State, int) -> State
-    board, current_player = itemgetter('board', 'current_player')(state)
+    board, player_to_move = itemgetter('board', 'player_to_move')(state)
     return {
-        'board': apply_move(board, current_player, move),
-        'current_player': (current_player + 1) % len(board)
+        'board': apply_move(board, player_to_move, move),
+        'player_to_move': (player_to_move + 1) % len(board)
     }
 
 def is_full(bitboards):
@@ -116,17 +116,17 @@ def play_game(agents, initial_board):
     def loop(history):
         # type: (list[list[int]]) -> None
         turn_number = len(history) - 1
-        current_player = turn_number % len(agents)
+        player_to_move = turn_number % len(agents)
         current_bitboards = history[turn_number]
         current_state = { 'board': current_bitboards,
-                          'current_player': current_player }
-        move = agents[current_player](current_state)
-        new_bitboards = apply_move(current_bitboards, current_player, move)
+                          'player_to_move': player_to_move }
+        move = agents[player_to_move](current_state)
+        new_bitboards = apply_move(current_bitboards, player_to_move, move)
         new_history = history + [new_bitboards]
         win_status = check_win(new_bitboards)
 
         print(f'Turn {turn_number}')
-        print(f'Current player: {current_player}')
+        print(f'Current player: {player_to_move}')
         print('New board:')
         print_game_state(new_bitboards)
         print() # newline
@@ -148,12 +148,12 @@ def play_game_result(agents, initial_board):
     def loop(history):
         # type: (list[list[int]]) -> int | None
         turn_number = len(history) - 1
-        current_player = turn_number % len(agents)
+        player_to_move = turn_number % len(agents)
         current_bitboards = history[turn_number]
         current_state = { 'board': current_bitboards,
-                          'current_player': current_player }
-        move = agents[current_player](current_state)
-        new_bitboards = apply_move(current_bitboards, current_player, move)
+                          'player_to_move': player_to_move }
+        move = agents[player_to_move](current_state)
+        new_bitboards = apply_move(current_bitboards, player_to_move, move)
         new_history = history + [new_bitboards]
         win_status = check_win(new_bitboards)
 
