@@ -99,11 +99,11 @@ def get_valid_moves_list(bitboards):
         if (valid_moves_bitmask > 0) and not is_terminal(bitboards)
         else None)
 
-def make_random_agent(get_valid_moves_list):
+def make_random_agent(get_moves_list):
     # type: (Callable[[list[int]], list[int] | None]) -> Callable[[State], int]
     def pick_random_move(state):
         # type: (State) -> int
-        moves = get_valid_moves_list(state['board'])
+        moves = get_moves_list(state['board'])
         random_index = randint(0, len(moves) - 1)
 
         return moves[random_index]

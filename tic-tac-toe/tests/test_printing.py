@@ -1,4 +1,9 @@
-from printing import *
+from printing import (
+    square_owner,
+    game_state_to_string,
+    create_dash_string,
+    create_row_separator
+)
 
 def test_square_owner():
     assert 0 == square_owner(0, [0b000000101, 0b000000110])
@@ -19,4 +24,3 @@ def test_create_row_separator():
     assert '---+---' == create_row_separator(2, 3)
     assert '--+--+--' == create_row_separator(3, 2)
     assert '-+-+-+-' == create_row_separator(4, 1)
-
