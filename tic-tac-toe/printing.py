@@ -20,9 +20,8 @@ def square_owner(index, bitboards):
         # type: (int, int) -> int
         if owner != -1 or i >= len(bitboards):
             return owner
-        else:
-            return loop(i + 1,
-                        i if (1 << index) & bitboards[i] > 0 else owner)
+
+        return loop(i + 1, i if (1 << index) & bitboards[i] > 0 else owner)
 
     return loop(0, -1)
 

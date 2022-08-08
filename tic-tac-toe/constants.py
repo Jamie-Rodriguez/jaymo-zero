@@ -1,5 +1,10 @@
+from math import floor
+
+
 BOARD_SIZE = 9
-WIDTH = 3
+WIDTH = 3 # number of columns
+# Should always be an int anyway, but just in case we use floor()
+HEIGHT = floor(BOARD_SIZE / WIDTH) # number of rows
 
 PLAYER_PIECE_SYMBOLS = ['O', 'X']
 

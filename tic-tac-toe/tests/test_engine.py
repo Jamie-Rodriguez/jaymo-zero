@@ -1,3 +1,4 @@
+import numpy as np
 from engine import (
     separate_bitboard,
     get_valid_moves_bitmask,
@@ -6,7 +7,9 @@ from engine import (
     is_full,
     check_win,
     is_terminal,
-    get_valid_moves_list
+    get_valid_moves_list,
+    one_d_to_2_d,
+    state_to_one_plane_encoding
 )
 
 
@@ -60,3 +63,28 @@ def test_get_valid_moves_list():
     assert [0b000000010, 0b000000100] == get_valid_moves_list([0b010110001, 0b101001000])
     # Terminal states should return None
     assert None is get_valid_moves_list([0b001100001, 0b010010010])
+
+
+def test_one_d_to_2_d():
+    assert (0, 1) == one_d_to_2_d(1, 3)
+    assert (1, 1) == one_d_to_2_d(4, 3)
+    assert (2, 2) == one_d_to_2_d(8, 3)
+
+def test_state_to_one_plane_encoding():
+    result = np.array(
+        [[0,  0, 0],
+         [0, -1, 0],
+         [0,  0, 1]]
+    ) == state_to_one_plane_encoding({'board': [0b100000000, 0b000010000],
+                                      'player_to_move': 0})
+
+    assert result.all()
+
+    result = np.array(
+        [[0,  0, 0],
+         [0, -1, 0],
+         [0,  0, 1]]
+    ) == state_to_one_plane_encoding({'board': [0b000010000, 0b100000000],
+                                      'player_to_move': 1})
+
+    assert result.all()
