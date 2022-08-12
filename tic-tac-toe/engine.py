@@ -80,6 +80,7 @@ def check_win(bitboards):
                     result or (direction == (bitboards[player] & direction)),
                 THREE_IN_A_ROW,
                 False):
+
                 return loop(player + 1, player)
 
             return loop(player + 1, win)

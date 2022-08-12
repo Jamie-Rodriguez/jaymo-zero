@@ -36,3 +36,16 @@ def state_to_one_plane_encoding(state):
             encoded_board[r][c] = OnePlaneEncoding.NOT_CURRENT_PLAYER
 
     return encoded_board
+
+def one_hot_encode_move(move):
+    # type: (int) -> npt.NDArray[np.int]
+    encoded = np.zeros((HEIGHT, WIDTH), dtype=int)
+
+    for i in range(BOARD_SIZE):
+        r, c = one_d_to_2_d(i, WIDTH)
+        square = (move >> i) & 1
+
+        if square == 1:
+            encoded[r][c] = 1
+
+    return encoded
