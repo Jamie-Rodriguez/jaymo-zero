@@ -56,7 +56,7 @@ def test_is_terminal():
     assert False is is_terminal([1, 0])
 
 def test_get_valid_moves_list():
-    assert None is get_valid_moves_list([0b000011111, 0b111100000])
+    assert [] == get_valid_moves_list([0b000011111, 0b111100000])
     assert [0b000000010, 0b000000100] == get_valid_moves_list([0b010110001, 0b101001000])
-    # Terminal states should return None
-    assert None is get_valid_moves_list([0b001100001, 0b010010010])
+    # Terminal states should return empty list
+    assert [] == get_valid_moves_list([0b001100001, 0b010010010])

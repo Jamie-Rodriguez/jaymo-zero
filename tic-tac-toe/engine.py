@@ -1,6 +1,6 @@
+from typing import TypedDict, List, Callable
 from functools import reduce
 from operator import itemgetter
-from typing import TypedDict, List, Callable
 from random import randint
 from constants import BOARD_AREA, THREE_IN_A_ROW, BOARD_SIZE, WIDTH, NEW_GAME
 from printing import print_game_state, print_board
@@ -94,12 +94,12 @@ def is_terminal(bitboards):
     return is_full(bitboards) or (check_win(bitboards) is not None)
 
 def get_valid_moves_list(bitboards):
-    # type: (list[int]) -> list[int] | None
+    # type: (list[int]) -> list[int]
     valid_moves_bitmask = get_valid_moves_bitmask(bitboards)
 
     return (separate_bitboard(valid_moves_bitmask)
         if (valid_moves_bitmask > 0) and not is_terminal(bitboards)
-        else None)
+        else [])
 
 
 def make_random_agent(get_moves_list):
