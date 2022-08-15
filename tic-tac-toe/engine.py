@@ -7,7 +7,7 @@ from printing import print_game_state, print_board
 
 
 class State(TypedDict):
-    bitboards: List[int]
+    board: List[int]
     player_to_move: int
 
 '''
@@ -70,43 +70,43 @@ def is_full(bitboards):
      0    | player 1 wins
      1    | player 2 wins
 '''
-def check_win(bitboards):
-    # type: (list[int]) -> int | None
+def check_win(state):
+    # type: (State) -> int | None
     def loop(player, win):
         # type: (int, int | None) -> int | None
-        if player < len(bitboards):
-            if reduce(
-                lambda result, direction:
-                    result or (direction == (bitboards[player] & direction)),
-                THREE_IN_A_ROW,
-                False):
+        if player >= len(state['board']):
+            return win
 
-                return loop(player + 1, player)
+        if reduce(
+            lambda result, direction:
+                result or (direction == (state['board'][player] & direction)),
+            THREE_IN_A_ROW,
+            False):
 
-            return loop(player + 1, win)
+            return loop(player + 1, player)
 
-        return win
+        return loop(player + 1, win)
 
     return loop(0, None)
 
-def is_terminal(bitboards):
-    # type: (list[int]) -> bool
-    return is_full(bitboards) or (check_win(bitboards) is not None)
+def is_terminal(state):
+    # type: (State) -> bool
+    return is_full(state['board']) or (check_win(state) is not None)
 
-def get_valid_moves_list(bitboards):
-    # type: (list[int]) -> list[int]
-    valid_moves_bitmask = get_valid_moves_bitmask(bitboards)
+def get_valid_moves_list(state):
+    # type: (State) -> list[int]
+    valid_moves_bitmask = get_valid_moves_bitmask(state['board'])
 
     return (separate_bitboard(valid_moves_bitmask)
-        if (valid_moves_bitmask > 0) and not is_terminal(bitboards)
-        else [])
+           if (valid_moves_bitmask > 0) and not is_terminal(state)
+           else [])
 
 
 def make_random_agent(get_moves_list):
-    # type: (Callable[[list[int]], list[int] | None]) -> Callable[[State], int]
+    # type: (Callable[[State], list[int] | None]) -> Callable[[State], int]
     def pick_random_move(state):
         # type: (State) -> int
-        moves = get_moves_list(state['board'])
+        moves = get_moves_list(state)
         random_index = randint(0, len(moves) - 1)
 
         return moves[random_index]
@@ -126,10 +126,14 @@ def play_game(agents, initial_board):
                           'player_to_move': player_to_move }
         move = agents[player_to_move](current_state)
         new_bitboards = apply_move(current_bitboards, player_to_move, move)
+                    # We don't actually use the new player_to_move
+                    # Only including it for completeness' sake
+        new_state = { 'board': new_bitboards,
+                      'player_to_move': (turn_number + 1) % len(agents) }
         new_history = history + [new_bitboards]
-        win_status = check_win(new_bitboards)
+        win_status = check_win(new_state)
 
-        print(f'Turn {turn_number}')
+        print(f'Turn {turn_number + 1}')
         print(f'Current player: {player_to_move}')
         print('New board:')
         print_game_state(new_bitboards)
@@ -139,7 +143,7 @@ def play_game(agents, initial_board):
         print() # newline
         print_board(BOARD_SIZE, WIDTH, new_bitboards)
         print() # newline
-        if is_terminal(new_bitboards):
+        if is_terminal(new_state):
             return new_history
 
         return loop(new_history)
@@ -158,10 +162,14 @@ def play_game_result(agents, initial_board):
                           'player_to_move': player_to_move }
         move = agents[player_to_move](current_state)
         new_bitboards = apply_move(current_bitboards, player_to_move, move)
+                    # We don't actually use the new player_to_move
+                    # Only including it for completeness' sake
+        new_state = { 'board': new_bitboards,
+                      'player_to_move': (turn_number + 1) % len(agents) }
         new_history = history + [new_bitboards]
-        win_status = check_win(new_bitboards)
+        win_status = check_win(new_state)
 
-        if is_terminal(new_bitboards):
+        if is_terminal(new_state):
             return win_status
 
         return loop(new_history)

@@ -43,20 +43,20 @@ def test_is_full():
     assert True is is_full([0b001001001, 0b110110110])
 
 def test_check_win():
-    assert 0 == check_win([0b001001001, 0])
-    assert 1 == check_win([0, 0b111000000])
-    assert None is check_win([0b000001001, 0b000000110])
+    assert 0 == check_win({'board': [0b001001001, 0]})
+    assert 1 == check_win({'board': [0, 0b111000000]})
+    assert None is check_win({'board': [0b000001001, 0b000000110]})
 
 def test_is_terminal():
     # Win for player 1
-    assert True is is_terminal([0b001001101, 0b100010010])
+    assert True is is_terminal({'board': [0b001001101, 0b100010010]})
     # Draw: full board
-    assert True is is_terminal([0b001110011, 0b110001100])
+    assert True is is_terminal({'board': [0b001110011, 0b110001100]})
     # Non-terminal
-    assert False is is_terminal([1, 0])
+    assert False is is_terminal({'board': [1, 0]})
 
 def test_get_valid_moves_list():
-    assert [] == get_valid_moves_list([0b000011111, 0b111100000])
-    assert [0b000000010, 0b000000100] == get_valid_moves_list([0b010110001, 0b101001000])
+    assert [] == get_valid_moves_list({'board': [0b000011111, 0b111100000]})
+    assert [0b000000010, 0b000000100] == get_valid_moves_list({'board': [0b010110001, 0b101001000]})
     # Terminal states should return empty list
-    assert [] == get_valid_moves_list([0b001100001, 0b010010010])
+    assert [] == get_valid_moves_list({'board': [0b001100001, 0b010010010]})
