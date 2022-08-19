@@ -9,7 +9,7 @@ if [[ $# -eq 0 ]] ; then
     exit 1
 fi
 
-python -m pytest --cov=$1 --cov-report term-missing --cov-branch $1/tests/
+python -m pytest -vv --cov=$1 --cov-report term-missing --cov-branch $1/tests/
 
 # Because pytest-cov automatically generates a .coverage file with no way to
 # delete it...

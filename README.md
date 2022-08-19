@@ -4,6 +4,8 @@ At the time of writing, this repo is a Python port of my [Tic-Tac-Clojure](https
 
 In this repo I want to test different approaches to using AI to play games at a high skill level; mostly using different reinforcement learning techniques.
 
+This codebase was written with `Python 3.8` and so may use some slightly older features with the `Typing` module and lacks support for [pattern matching](https://peps.python.org/pep-0634).
+
 I may create more game environments to experiment with in the future, we will see...
 
 Requirements
