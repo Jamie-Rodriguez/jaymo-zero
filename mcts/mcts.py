@@ -4,6 +4,7 @@ from math import inf, sqrt, log
 from functools import reduce, partial
 from random import randint
 from sys import maxsize
+from tail_recursive import tail_recursive
 
 
 State = TypeVar("State")
@@ -232,6 +233,7 @@ def make_mcts_agent(exploration,
 
     def mcts(state):
         # type: (State) -> Move
+        @tail_recursive
         def loop(tree, budget):
             # type: (Node, int) -> Move
             if budget <= 0:
@@ -296,7 +298,8 @@ def make_mcts_agent(exploration,
             # We don't know the previous state, especially for the case
             # that the root node is the start of the game i.e. there
             # was not previous state
-            return loop(backprop(result, path, new_tree, -1), budget - 1)
+            return loop.tail_call(backprop(result, path, new_tree, -1),
+                                  budget - 1)
 
         return loop({ 'state': state,
                       'num_rollouts': 0,

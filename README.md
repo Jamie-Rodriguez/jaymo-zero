@@ -57,7 +57,6 @@ python play-tic-tac-toe.py
 
 To-Do
 =====
-- Consider using tail-call optimisation for functions that can potentially be unbounded in size, probably using [this library](https://github.com/0scarB/tail-recursive)
 - Add linting
 - See if there are better test-coverage reporting libraries
 - Parallelise MCTS AI

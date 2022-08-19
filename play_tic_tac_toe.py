@@ -19,7 +19,7 @@ if __name__ == '__main__':
                                apply_move_to_state,
                                check_win,
                                0, # Player index!
-                               100),
+                               1000),
                make_random_agent(get_valid_moves_list)],
               [NEW_GAME])
 
@@ -27,10 +27,10 @@ if __name__ == '__main__':
     print(f'------------------------------ Playing {n} games ------------------------------')
     play_n_games([make_random_agent(get_valid_moves_list),
                   make_mcts_agent(1.2,
-                               get_valid_moves_list,
-                               is_terminal,
-                               apply_move_to_state,
-                               check_win,
-                               1, # Player index!
-                               100)],
+                                  get_valid_moves_list,
+                                  is_terminal,
+                                  apply_move_to_state,
+                                  check_win,
+                                  1, # Player index!
+                                  100)],
                  n)
