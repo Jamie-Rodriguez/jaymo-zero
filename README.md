@@ -24,19 +24,19 @@ I run this project using Python's *virtual environments* to isolate the dependen
 
 ## 1. Create a Python virtual environment
 I name mine `.venv`, using the following command from the *root directory*:
-```bash
+```shell
 python3 -m venv .venv
 ```
 The generated `.venv` folder is already added to `.gitignore`
 
 ## 2. Activate virtual environment in current shell
 From the *root directory*:
-```bash
+```shell
 source .venv/bin/activate
 ```
 
 ## 3. Install project dependencies
-```bash
+```shell
 python -m pip install --requirement requirements.txt
 ```
 
@@ -44,15 +44,15 @@ python -m pip install --requirement requirements.txt
 I would recommend using `run-tests.sh` because the script will make sure that you provide a specific directory/project, run tests with a coverage report and clean up the `.coverage` report that would otherwise be left behind by `pytest-cov`.
 
 Example usage:
-```bash
-./run-tests.sh tic-tac-toe
+```shell
+./run-tests.sh tictactoe
 ```
 
 Running games
 =============
-As of time of writing, some example usage is provided in the `main` function of `tic-tac-toe/engine.py`:
-```bash
-python tic-tac-toe/engine.py
+Some example usage of setting up a Monte Carlo Tree Search agent vs a random move agent is provided in `play-tic-tac-toe.py`:
+```shell
+python play-tic-tac-toe.py
 ```
 
 To-Do
@@ -60,4 +60,5 @@ To-Do
 - Consider using tail-call optimisation for functions that can potentially be unbounded in size, probably using [this library](https://github.com/0scarB/tail-recursive)
 - Add linting
 - See if there are better test-coverage reporting libraries
+- Parallelise MCTS AI
 - Get around to *to-do*'s in code
