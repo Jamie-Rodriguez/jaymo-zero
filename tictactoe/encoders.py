@@ -1,11 +1,11 @@
 from enum import IntEnum
 from operator import itemgetter
+from math import floor
 import numpy as np
 import numpy.typing as npt
-from constants import BOARD_SIZE, WIDTH, HEIGHT
-from math import floor
-from engine import State
-from printing import square_owner
+from .constants import BOARD_SIZE, WIDTH, HEIGHT
+from .engine import State
+from .printing import square_owner
 
 
 # Assumes board shape is n x m i.e. no staggered arrays

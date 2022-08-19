@@ -2,7 +2,7 @@ from math import inf, exp
 from functools import reduce
 from random import seed, randint
 from sys import maxsize
-from mcts import (
+from mcts.mcts import (
     uct,
     pick_best_move,
     State,

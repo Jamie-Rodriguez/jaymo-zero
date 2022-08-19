@@ -1,5 +1,5 @@
 from math import log10, floor
-from constants import BOARD_SIZE, WIDTH, PLAYER_PIECE_SYMBOLS
+from .constants import BOARD_SIZE, WIDTH, PLAYER_PIECE_SYMBOLS
 
 
 def print_game_state(bitboards):

@@ -2,8 +2,8 @@ from typing import TypedDict, List, Callable
 from functools import reduce
 from operator import itemgetter
 from random import randint
-from constants import BOARD_AREA, THREE_IN_A_ROW, BOARD_SIZE, WIDTH, NEW_GAME
-from printing import print_game_state, print_board
+from .constants import BOARD_AREA, THREE_IN_A_ROW, BOARD_SIZE, WIDTH, NEW_GAME
+from .printing import print_game_state, print_board
 
 
 class State(TypedDict):
@@ -11,7 +11,7 @@ class State(TypedDict):
     player_to_move: int
 
 '''
-  Uses a modified version of Brian Kernighan’s Algorithm.
+  Uses a modified version of Brian Kernighan's Algorithm.
   Instead of just counting the number of set bits, writes the set bits into a list.
   Uses the fact that n & (n-1) removes the *rightmost* SET bit from n
   Then use n XOR (n & (n-1)) to get the removed bit, and add it to the list
@@ -33,14 +33,14 @@ def separate_bitboard(bitboard):
 
     return loop(bitboard, [])
 
-# bitwise-and with the boundary of the board so that we don't have to deal with
+# Bitwise-and with the boundary of the board so that we don't have to deal with
 # negative number arithmetic
 def get_valid_moves_bitmask(bitboards):
     # type: (list[int]) -> int
     return BOARD_AREA & ~reduce(lambda a, b: a | b, bitboards)
 
-# apply-move is idempotent; a move on an already-occupied square or out of bounds
-# should return the same state
+# apply_move() is idempotent; a move on an already-occupied square or out of
+# bounds should return the same state
 def apply_move(bitboards, player, move):
     # type: (list[int], int, int) -> list[int]
     if (move & get_valid_moves_bitmask(bitboards)) > 0:

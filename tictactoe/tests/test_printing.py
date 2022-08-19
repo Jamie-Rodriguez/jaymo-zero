@@ -1,4 +1,4 @@
-from printing import (
+from tictactoe.printing import (
     square_owner,
     game_state_to_string,
     create_dash_string,

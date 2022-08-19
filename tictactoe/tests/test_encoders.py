@@ -1,5 +1,5 @@
 import numpy as np
-from encoders import (
+from tictactoe.encoders import (
     one_d_to_2_d,
     state_to_one_plane_encoding,
     one_hot_encode_move

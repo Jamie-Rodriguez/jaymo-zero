@@ -1,4 +1,4 @@
-from engine import (
+from tictactoe.engine import (
     separate_bitboard,
     get_valid_moves_bitmask,
     apply_move,
