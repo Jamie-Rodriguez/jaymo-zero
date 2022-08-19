@@ -4,7 +4,7 @@ from math import inf, sqrt, log
 from functools import reduce, partial
 from random import randint
 from sys import maxsize
-from tail_recursive import tail_recursive
+from tail_recursive import tail_recursive, FeatureSet
 
 
 State = TypeVar("State")
@@ -233,7 +233,7 @@ def make_mcts_agent(exploration,
 
     def mcts(state):
         # type: (State) -> Move
-        @tail_recursive
+        @tail_recursive(feature_set=FeatureSet.BASE)
         def loop(tree, budget):
             # type: (Node, int) -> Move
             if budget <= 0:

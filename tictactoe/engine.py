@@ -2,6 +2,7 @@ from typing import TypedDict, List, Callable
 from functools import reduce
 from operator import itemgetter
 from random import randint
+from tail_recursive import tail_recursive, FeatureSet
 from .constants import BOARD_AREA, THREE_IN_A_ROW, BOARD_SIZE, WIDTH, NEW_GAME
 from .printing import print_game_state, print_board
 
@@ -178,6 +179,7 @@ def play_game_result(agents, initial_board):
 
 def play_n_games(agents, num_games):
     # type: (list[Callable[[State], int]], int) -> dict
+    @tail_recursive(feature_set=FeatureSet.BASE)
     def loop(stats, n):
         # type: (dict, int) -> dict
         result = play_game_result(agents, [NEW_GAME])
