@@ -4,6 +4,7 @@ from math import inf, sqrt, log
 from functools import reduce, partial
 from random import randint
 from sys import maxsize
+from tail_recursive import tail_recursive, FeatureSet
 
 
 State = TypeVar("State")
@@ -62,12 +63,13 @@ def pick_unexplored_move(get_random_int, get_valid_moves, is_terminal, node):
 
 def select(exploration, get_random_int, get_valid_moves, is_terminal, tree):
     # type: (float, Callable[[], int], Callable[[State], list[Move]], Callable[[State], bool], Node) -> list[Move]
-    current_node = tree
-    path = []
+    def loop(current_node, path):
+        # type: (Node, list[Move]) -> list[Move]
+        # If we have arrived at a not fully explored node or a terminal state
+        if (len(get_valid_moves(current_node['state']))
+           != len(current_node['moves'])) or is_terminal(current_node['state']):
+            return path
 
-    # If we *haven't* arrived at a not fully explored node or a terminal state
-    while (len(get_valid_moves(current_node['state']))
-           == len(current_node['moves'])) and not is_terminal(current_node['state']):
         # Here we just grab current_node['num_rollouts'] instead of
         # calculating it from the child moves
         # If there is no possibility of current_node['num_rollouts'] being
@@ -90,15 +92,18 @@ def select(exploration, get_random_int, get_valid_moves, is_terminal, tree):
         # Settle the tie-break
         next_node = current_node['moves'][max_ucts[get_random_int() % len(max_ucts)]['index']]
 
-        current_node = next_node
-        path = path + [next_node['move']]
+        return loop(next_node, path + [next_node['move']])
 
-    return path
+    return loop(tree, [])
 
 # Probably don't need unit tests for this tiny helper function...
 def get_next_node(next_move, nodes):
     # type: (Move, list[Node]) -> Node | None
-    while nodes:
+    def loop(nodes):
+        # type: (list[Node]) -> Node | None
+        if len(nodes) == 0:
+            return None
+
         current_node = nodes[0]
         rest_nodes = nodes[1:]
 
@@ -108,26 +113,22 @@ def get_next_node(next_move, nodes):
         if not rest_nodes:
             return None
 
-        nodes = rest_nodes
+        return loop(rest_nodes)
 
-    # If hit here, len(nodes) == 0
-    return None
+    return loop(nodes)
 
 def treewalk(path, node):
     # type: (list[Move], Node) -> Node
     if not path:
         return node
 
-    while path:
-        node = get_next_node(path[0], node['moves'])
-        path = path[1:]
-
-    return node
+    return treewalk(path[1:], get_next_node(path[0], node['moves']))
 
 # This is the "expansion" step, but I think "replace node" is more indicative
 # of *how* we are achieving it
 # TO-DO: Protect against invalid path
-def replace_node(node, path, updated_node): # type: (Node, list[Move], Node) -> Node
+def replace_node(node, path, updated_node):
+    # type: (Node, list[Move], Node) -> Node
     if not path:
         return updated_node
 
@@ -150,28 +151,30 @@ def simulate (is_terminal,
               apply_move,
               initial_state):
     # type: (Callable[[State], bool], Callable[[State], int | None], Callable[[State], list[Move]], Callable[[], int], Callable[[State, Move], State], State) -> int | None
-    state = initial_state
 
-    while not is_terminal(state):
+    def loop(state):
+        # type: (State) -> int | None
+        if is_terminal(state):
+            return check_win(state)
+
         moves = valid_moves(state)
         next_move = moves[random_int() % len(moves)]
 
-        state = apply_move(state, next_move)
+        return loop(apply_move(state, next_move))
 
-    return check_win(state)
+    return loop(initial_state)
 
 def is_path_valid(node, path):
     # type: (Node, list[Move]) -> bool
-    while path:
-        next_node = get_next_node(path[0], node['moves'])
+    if not path:
+        return True
 
-        if next_node is None:
-            return False
+    next_node = get_next_node(path[0], node['moves'])
 
-        node = next_node
-        path = path[1:]
+    if next_node is None:
+        return False
 
-    return True
+    return is_path_valid(next_node, path[1:])
 
 '''
   Note: The root node's score is not actually used, but we backprop up to it
@@ -224,18 +227,37 @@ def make_mcts_agent(exploration,
                     check_win,
                     computation_budget):
     # type: (float, Callable[[State], list[Move]], Callable[[State], bool], Callable[[State, Move], State], Callable[[State], int | None], int) -> Callable[[State], Move]
+
     def get_random_int():
         # type: () -> int
         return randint(0, maxsize)
 
     def mcts(state):
         # type: (State) -> Move
-        tree = { 'state': state,
-                 'num_rollouts': 0,
-                 'score': 0,
-                 'moves': [] }
+        @tail_recursive(feature_set=FeatureSet.BASE)
+        def loop(tree, budget):
+            # type: (Node, int) -> Move
+            if budget <= 0:
+                # https://ai.stackexchange.com/questions/16905/mcts-how-to-choose-the-final-action-from-the-root
+                # Choose best move via the "robust child" method = highest # of visits
+                # Tie-break strategy: random choice
+                max_rollouts = reduce(
+                                lambda most_visited, current_node:
+                                    most_visited + [current_node] if
+                                        current_node['num_rollouts'] == most_visited[0]['num_rollouts']
+                                    else [current_node] if
+                                        current_node['num_rollouts'] > most_visited[0]['num_rollouts']
+                                    else most_visited,
+                                tree['moves'][1:],
+                                [tree['moves'][0]])
 
-        for _ in range(computation_budget):
+                # There is a possibility that multiple moves may have the same statistics;
+                # i.e. having the same number of rollouts.
+                # Settle the tie-break
+                next_node = max_rollouts[randint(0, len(max_rollouts) - 1)]
+
+                return next_node['move']
+
             selected_node_path = select(exploration,
                                         get_random_int,
                                         get_valid_moves,
@@ -265,7 +287,6 @@ def make_mcts_agent(exploration,
                 }
 
                 new_tree = replace_node(tree, selected_node_path, expanded_node)
-
             # Simulate handles terminal nodes
             result = simulate(is_terminal,
                               check_win,
@@ -278,26 +299,13 @@ def make_mcts_agent(exploration,
             # We don't know the previous state, especially for the case
             # that the root node is the start of the game i.e. there
             # was not previous state
-            tree = backprop(result, path, new_tree, -1)
+            return loop.tail_call(backprop(result, path, new_tree, -1),
+                                  budget - 1)
 
-        # https://ai.stackexchange.com/questions/16905/mcts-how-to-choose-the-final-action-from-the-root
-        # Choose best move via the "robust child" method = highest # of visits
-        # Tie-break strategy: random choice
-        max_rollouts = reduce(
-                        lambda most_visited, current_node:
-                            most_visited + [current_node] if
-                                current_node['num_rollouts'] == most_visited[0]['num_rollouts']
-                            else [current_node] if
-                                current_node['num_rollouts'] > most_visited[0]['num_rollouts']
-                            else most_visited,
-                        tree['moves'][1:],
-                        [tree['moves'][0]])
-
-        # There is a possibility that multiple moves may have the same statistics;
-        # i.e. having the same number of rollouts.
-        # Settle the tie-break
-        next_node = max_rollouts[randint(0, len(max_rollouts) - 1)]
-
-        return next_node['move']
+        return loop({ 'state': state,
+                      'num_rollouts': 0,
+                      'score': 0,
+                      'moves': [] },
+                    computation_budget)
 
     return mcts

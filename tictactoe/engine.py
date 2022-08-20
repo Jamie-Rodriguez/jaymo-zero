@@ -179,22 +179,17 @@ def play_game_result(agents, initial_board):
 
 def play_n_games(agents, num_games):
     # type: (list[Callable[[State], int]], int) -> dict
-    @tail_recursive(feature_set=FeatureSet.BASE)
-    def loop(stats, n):
-        # type: (dict, int) -> dict
+    stats = { 'wins': [0, 0], 'draws': 0 }
+
+    for _ in range(num_games):
         result = play_game_result(agents, [NEW_GAME])
-        if n == 0:
-            return print(stats)
 
-        return loop({ **stats, 'draws': stats['draws'] + 1 } if result is None
-                    else {
-                        **stats,
-                        'wins': [w + 1 if i == result else w
-                                 for i, w in enumerate(stats['wins'])]
-                    },
-                    n - 1)
+        stats = ({ **stats, 'draws': stats['draws'] + 1 } if result is None else
+                 { **stats,
+                   'wins': [w + 1 if i == result else w
+                                for i, w in enumerate(stats['wins'])] })
 
-    return loop({ 'wins': [0, 0], 'draws': 0 }, num_games)
+    return print(stats)
 
 
 if __name__ == '__main__':
